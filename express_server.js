@@ -33,6 +33,7 @@ app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
+// For iterating through an object
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
@@ -42,6 +43,7 @@ app.get('/urls/new', (req, res) => {
   res.render('urls_new');
 });
 
+// Redirection
 app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
