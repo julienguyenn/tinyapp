@@ -18,6 +18,18 @@ function generateRandomString() {
   return newString;
 }
 
+const users = {
+};
+
+function lookupEmail (email) {
+  for (let user in users) {
+    if (user.email === email) {
+      return true;
+    }
+  }
+  return false;
+}
+
 const urlDatabase = {
   'b2xVn2': 'http://www.lighthouselabs.ca',
   '9sm5xK': 'http://www.google.com'
@@ -35,28 +47,60 @@ app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
+app.get('/register', (req, res) => {
+  let templateVars = { user_id
+    : req.cookies["user_id"]};
+  res.render('registration.ejs', templateVars);
+})
+
+app.post('/register', (req, res) => {
+  const randomID = generateRandomString();
+  const email = req.body.emailAddress;
+  const password = req.body.pwd;
+  if (email === "" || password === "") {
+    res.statusCode = 400;
+    res.send('ERROR 400: Please fill out email and password')
+  } else if (lookupEmail(email)) { 
+    res.statusCode = 400;
+    res.send('ERROR 400: Email already exist!');
+  } else {
+    users[randomID] = { id: randomID, email: email, password: password };
+    res.cookie('user_id', randomID);
+  }
+  res.redirect('/urls');
+});
+
 // For iterating through an object
 app.get('/urls', (req, res) => {
-  let templateVars = { username: req.cookies["username"], urls: urlDatabase };
+  let templateVars = { user_id: req.cookies["user_id"], urls: urlDatabase };
   res.render('urls_index', templateVars);
 });
 
 app.get('/urls/new', (req, res) => {
-  let templateVars = { username: req.cookies["username"]};
+  let templateVars = { user_id: req.cookies["user_id"]};
   res.render('urls_new', templateVars);
 });
 
+app.get('/login', (req, res) => {
+  let templateVars = { user_id: req.cookies["user_id"]};
+  res.render('login.ejs', templateVars);
+});
+
 app.post('/login', (req, res) => {
-  const username = req.body.username;
-  res.cookie('username', username)
+  if (lookupEmail(req.body.emailAddress)) {
+    const user_id = req.body.user_id;
+    res.cookie('user_id', user_id)
+  } else if (lookupEmail(req.body.emailAddress)) {
+    res.statusCode = 403;
+    res.send("ERROR 403: Email does not exist!")
+  } //////// LEFT OFF HERE////////////////******************************* */
   res.redirect('/urls')
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('username')
+  res.clearCookie('user_id')
   res.redirect('/urls')
 });
-
 
 // Redirection for creating non-existing URL
 app.post('/urls', (req, res) => {
@@ -73,7 +117,7 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  let templateVars = { username: req.cookies["username"], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] }
+  let templateVars = { user_id: req.cookies["user_id"], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] }
   res.render('urls_show', templateVars);
 });
 
