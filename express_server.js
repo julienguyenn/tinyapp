@@ -147,12 +147,12 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  let templateVars = { user_id: req.cookies["user_id"], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], users: users }
+  let templateVars = { user_id: req.cookies["user_id"], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, users: users }
   res.render('urls_show', templateVars);
 });
 
 app.get('/u/:shortURL', (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });  
 
