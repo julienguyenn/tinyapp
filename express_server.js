@@ -3,6 +3,8 @@ const app = express();
 const PORT = 8080;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const bcrypt = require('brcrypt');
+
 
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
@@ -71,7 +73,7 @@ app.get('/register', (req, res) => {
 
 app.post('/register', (req, res) => {
   const email = req.body.emailAddress;
-  const password = req.body.pwd;
+  const password = bcrypt.hashSync(req.body.pwd, 10);
   if (email === "" || password === "") {
     res.statusCode = 400;
     res.send('ERROR 400: Please fill out email and password')
