@@ -48,7 +48,7 @@ app.get('/urls.json', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  let templateVars = { user_id: req.cookies["user_id"]};
+  let templateVars = { user_id: req.cookies["user_id"], users: users };
   res.render('registration.ejs', templateVars);
 })
 
@@ -73,17 +73,17 @@ app.post('/register', (req, res) => {
 
 // For iterating through an object
 app.get('/urls', (req, res) => {
-  let templateVars = { user_id: req.cookies["user_id"], urls: urlDatabase };
+  let templateVars = { user_id: req.cookies["user_id"], urls: urlDatabase, users: users };
   res.render('urls_index', templateVars);
 });
 
 app.get('/urls/new', (req, res) => {
-  let templateVars = { user_id: req.cookies["user_id"]};
+  let templateVars = { user_id: req.cookies["user_id"], users: users };
   res.render('urls_new', templateVars);
 });
 
 app.get('/login', (req, res) => {
-  let templateVars = { user_id: req.cookies["user_id"]};
+  let templateVars = { user_id: req.cookies["user_id"], users: users };
   res.render('login.ejs', templateVars);
 });
 
@@ -123,7 +123,7 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  let templateVars = { user_id: req.cookies["user_id"], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] }
+  let templateVars = { user_id: req.cookies["user_id"], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], users: users }
   res.render('urls_show', templateVars);
 });
 
