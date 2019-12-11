@@ -138,9 +138,11 @@ app.post('/urls', (req, res) => {
 });
 
 app.post('/urls/:shortURL/edit', (req, res) => {
-  const shortURL = req.params.shortURL;
-  const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
+  if (req.cookies["user_id"]) {
+    const shortURL = req.params.shortURL;
+    const longURL = req.body.longURL;
+    urlDatabase[shortURL] = longURL;
+  }
   res.redirect('/urls');
 });
 
@@ -155,8 +157,10 @@ app.get('/u/:shortURL', (req, res) => {
 });  
 
 app.post('/urls/:shortURL/delete', (req, res) => {
-  const shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL]
+  if (req.cookies["user_id"]) {
+    const shortURL = req.params.shortURL;
+    delete urlDatabase[shortURL]
+  }
   res.redirect('/urls');
 });
 
