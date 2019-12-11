@@ -46,7 +46,7 @@ function urlsForUser (id) {
   let userUrls = {};
   for (url in urlDatabase) {
     if (urlDatabase[url].userID === id) {
-      usersUrls[url] = urlDatabase[url].longURL;
+      userUrls[url] = urlDatabase[url].longURL;
     }
   }
   return userUrls;
@@ -90,7 +90,8 @@ app.post('/register', (req, res) => {
 
 // For iterating through an object
 app.get('/urls', (req, res) => {
-  let templateVars = { user_id: req.cookies["user_id"], urls: urlDatabase, users: users };
+  const userURLs = urlsForUser(req.cookies["user_id"]);
+  let templateVars = { user_id: req.cookies["user_id"], urls: userURLs, users: users };
   res.render('urls_index', templateVars);
 });
 
