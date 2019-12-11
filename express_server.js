@@ -23,11 +23,11 @@ const users = {
 
 function lookupEmail (email) {
   for (let user in users) {
-    if (user.email === email) {
-      return true;
+    if (users[user].email === email) {
+      return [true, user, users[user].password];
     }
   }
-  return false;
+  return [false];
 }
 
 const urlDatabase = {
@@ -48,23 +48,24 @@ app.get('/urls.json', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  let templateVars = { user_id
-    : req.cookies["user_id"]};
+  let templateVars = { user_id: req.cookies["user_id"]};
   res.render('registration.ejs', templateVars);
 })
 
 app.post('/register', (req, res) => {
-  const randomID = generateRandomString();
   const email = req.body.emailAddress;
   const password = req.body.pwd;
   if (email === "" || password === "") {
     res.statusCode = 400;
     res.send('ERROR 400: Please fill out email and password')
-  } else if (lookupEmail(email)) { 
+  } else if (lookupEmail(email)[0]) { 
     res.statusCode = 400;
     res.send('ERROR 400: Email already exist!');
   } else {
+    const randomID = generateRandomString();
+    console.log('here');
     users[randomID] = { id: randomID, email: email, password: password };
+    console.log(users);
     res.cookie('user_id', randomID);
   }
   res.redirect('/urls');
@@ -87,14 +88,19 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  if (lookupEmail(req.body.emailAddress)) {
-    const user_id = req.body.user_id;
-    res.cookie('user_id', user_id)
-  } else if (lookupEmail(req.body.emailAddress)) {
+  const lookupEmailResult = lookupEmail(req.body.emailAddress);
+  if (lookupEmailResult[0]) {
+    if (req.body.pwd === lookupEmailResult[2]) {
+      res.cookie('user_id', lookupEmailResult[1]);
+      res.redirect('/urls')
+    } else {
+      res.statusCode = 403;
+      res.send("ERROR 403: Password does not match email")
+    }
+  } else if (!lookupEmailResult[0]) {
     res.statusCode = 403;
     res.send("ERROR 403: Email does not exist!")
-  } //////// LEFT OFF HERE////////////////******************************* */
-  res.redirect('/urls')
+  }
 });
 
 app.post('/logout', (req, res) => {
