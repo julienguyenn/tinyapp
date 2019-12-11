@@ -31,17 +31,6 @@ const users = {
   }
 };
 
-console.log(users);
-
-function lookupEmail (email) {
-  for (let user in users) {
-    if (users[user].email === email) {
-      return [true, user, users[user].password];
-    }
-  }
-  return [false];
-};
-
 
 const urlDatabase = {
   'b2xVn2': {longURL: 'http://www.lighthouselabs.ca', userID:  "aJ48lW"},
@@ -57,6 +46,14 @@ function urlsForUser (id) {
     }
   }
   return userUrls;
+}
+
+function getUserByEmail (email, database) {
+  for (let user in database) {
+    if (database[user].email === email) {
+      return database[user];
+    }
+  }
 }
 
 app.get('/', (req, res) => {
@@ -82,14 +79,12 @@ app.post('/register', (req, res) => {
   if (email === "" || password === "") {
     res.statusCode = 400;
     res.send('ERROR 400: Please fill out email and password')
-  } else if (lookupEmail(email)[0]) { 
+  } else if (getUserByEmail(email, users)) { 
     res.statusCode = 400;
     res.send('ERROR 400: Email already exist!');
   } else {
     const randomID = generateRandomString();
-    console.log('here');
     users[randomID] = { id: randomID, email: email, password: password };
-    console.log(users);
     req.session.user_id = randomID;
   }
   res.redirect('/urls');
@@ -117,16 +112,17 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const lookupEmailResult = lookupEmail(req.body.emailAddress);
-  if (lookupEmailResult[0]) {
-    if (bcrypt.compareSync(req.body.pwd, lookupEmailResult[2])) {
-      req.session.user_id = lookupEmailResult[1];
+  const lookupEmailResult = getUserByEmail(req.body.emailAddress, users);
+  console.log(lookupEmailResult)
+  if (lookupEmailResult) {
+    if (bcrypt.compareSync(req.body.pwd, lookupEmailResult.password)) {
+      req.session.user_id = lookupEmailResult.id;
       res.redirect('/urls')
     } else {
       res.statusCode = 403;
       res.send("ERROR 403: Password does not match email")
     }
-  } else if (!lookupEmailResult[0]) {
+  } else {
     res.statusCode = 403;
     res.send("ERROR 403: Email does not exist!")
   }
