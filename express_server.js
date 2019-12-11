@@ -33,12 +33,24 @@ function lookupEmail (email) {
     }
   }
   return [false];
-}
+};
+
 
 const urlDatabase = {
   'b2xVn2': {longURL: 'http://www.lighthouselabs.ca', userID:  "aJ48lW"},
   '9sm5xK': {longURL: 'http://www.google.com', userID:  "aJ48lW"}
 };
+
+
+function urlsForUser (id) {
+  let userUrls = {};
+  for (url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      usersUrls[url] = urlDatabase[url].longURL;
+    }
+  }
+  return userUrls;
+}
 
 app.get('/', (req, res) => {
   res.send('Hello!');
