@@ -28,6 +28,8 @@ const users = {
   }
 };
 
+console.log(users);
+
 function lookupEmail (email) {
   for (let user in users) {
     if (users[user].email === email) {
@@ -114,7 +116,7 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   const lookupEmailResult = lookupEmail(req.body.emailAddress);
   if (lookupEmailResult[0]) {
-    if (req.body.pwd === lookupEmailResult[2]) {
+    if (bcrypt.compareSync(req.body.pwd, lookupEmailResult[2])) {
       res.cookie('user_id', lookupEmailResult[1]);
       res.redirect('/urls')
     } else {
