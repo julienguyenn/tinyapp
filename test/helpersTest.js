@@ -18,9 +18,9 @@ const testUsers = {
 };
 
 const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" },
-  q1h3Gr: { longURL: "facebook.com", userID: "gew22h" }
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW", visitors: 0 },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW", visitors: 0 },
+  q1h3Gr: { longURL: "facebook.com", userID: "gew22h", visitors: 0 }
 };
 
 describe('getUserByEmail', function() {
@@ -42,8 +42,8 @@ describe('urlsForUser', function() {
   it('should return the correct urls for a valid user', function() {
     const urls = urlsForUser("aJ48lW", urlDatabase);
     const expectedOutput = {
-      b6UTxQ: "https://www.tsn.ca",
-      i3BoGr: "https://www.google.ca"
+      b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW", visitors: 0 },
+      i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW", visitors: 0 }
     }
     assert.deepEqual(urls, expectedOutput);
   });

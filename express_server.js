@@ -72,7 +72,7 @@ app.get('/urls/new', (req, res) => {
   if (req.session.user_id === undefined) {
     res.redirect("/login");
   } else {
-    let templateVars = { user_id: req.session.user_id, users: users };
+    let templateVars = { user_id: req.session.user_id, users: users};
     res.render('urls_new', templateVars);
   }
 });
@@ -84,7 +84,6 @@ app.get('/login', (req, res) => {
 
 app.post('/login', (req, res) => {
   const lookupEmailResult = getUserByEmail(req.body.emailAddress, users);
-  console.log(lookupEmailResult)
   if (lookupEmailResult) {
     if (bcrypt.compareSync(req.body.pwd, users[lookupEmailResult].password)) {
       req.session.user_id = users[lookupEmailResult].id;
@@ -107,7 +106,7 @@ app.post('/logout', (req, res) => {
 // Redirection for creating non-existing URL
 app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.session.user_id };
+  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.session.user_id, visitors: 0 };
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -121,7 +120,7 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  let templateVars = { user_id: req.session.user_id, shortURL: req.params.shortURL, users: users, longURL: undefined, owner: false }
+  let templateVars = { user_id: req.session.user_id, shortURL: req.params.shortURL, users: users, longURL: undefined, owner: false, urls: urlsForUser(req.session.user_id, urlDatabase)}
   if (urlDatabase[req.params.shortURL]) {
     templateVars.longURL = urlDatabase[req.params.shortURL].longURL;
     if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
@@ -134,6 +133,7 @@ app.get('/urls/:shortURL', (req, res) => {
 app.get('/u/:shortURL', (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
     const longURL = urlDatabase[req.params.shortURL].longURL;
+    urlDatabase[req.params.shortURL].visitors+= 1;
     res.redirect(longURL);
   } else {
     res.statusCode = 400;

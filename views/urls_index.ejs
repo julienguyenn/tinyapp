@@ -32,14 +32,14 @@
           <th scope="col">Edit</th>
           <th scope="col">Delete</th>
           <th scope="col">Date Created</th>
-          <th scope="col">Vistors</th>
+          <th scope="col">Visitors</th>
         </tr>
       </thead>
       <tbody>
         <% for(let url in urls) { %>
         <tr>
           <td><%= url %></td>
-          <td><%= urls[url] %></td>
+          <td><%= urls[url].longURL %></td>
           <td>
             <form method="GET" action=<%=`/urls/${url}` %>>
               <button type="submit" class="btn btn-outline-primary">Edit</button>
@@ -54,10 +54,16 @@
             <% var nowDate = new Date()%>
             <%= nowDate.getFullYear()+'/'+(nowDate.getMonth()+1)+'/'+nowDate.getDate() %>
           </td>
+          <td>
+            <%= urls[url].visitors %>
+          </td>
         </tr>
         <% } %>
       </tbody>
     </table>
+    <div>
+      <a class="nav-item nav-link" href="/urls/new">Create a New Short Link</a>
+    </div>
     <% } %>
   </main>
   <!-- Bootstrap JS -->

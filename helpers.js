@@ -21,7 +21,7 @@ function urlsForUser (id, urlData) {
   let userUrls = {};
   for (url in urlData) {
     if (urlData[url].userID === id) {
-      userUrls[url] = urlData[url].longURL;
+      userUrls[url] = urlData[url];
     }
   }
   return userUrls;
