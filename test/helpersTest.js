@@ -23,6 +23,7 @@ const urlDatabase = {
   q1h3Gr: { longURL: "facebook.com", userID: "gew22h", visitors: 0 }
 };
 
+// TEST 1
 describe('getUserByEmail', function() {
   it('should return a user with valid email', function() {
     const user = getUserByEmail("user@example.com", testUsers)
@@ -38,6 +39,7 @@ describe('getUserByEmail', function() {
   });
 });
 
+// TEST 2
 describe('urlsForUser', function() {
   it('should return the correct urls for a valid user', function() {
     const urls = urlsForUser("aJ48lW", urlDatabase);

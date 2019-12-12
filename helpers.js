@@ -7,6 +7,7 @@ function getUserByEmail (email, database) {
   }
 }
 
+// GENERATES A RANDOM STRING FOR A NEW USER AND COOKIE
 function generateRandomString() {
   const possibleChars = 'ABCDEFGHIJKLMOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let newString = '';
@@ -15,8 +16,9 @@ function generateRandomString() {
     newString += possibleChars[index];
   }
   return newString;
-}
+};
 
+// FILTERS OUT ALL URLS OWNED BY 'id'
 function urlsForUser (id, urlData) {
   let userUrls = {};
   for (url in urlData) {
