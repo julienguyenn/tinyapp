@@ -4,6 +4,9 @@ const PORT = 8080;
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
+const { getUserByEmail } = require('./helpers');
+const { generateRandomString } = require('./helpers');
+const { urlsForUser } = require('./helpers');
 
 
 app.set('view engine', 'ejs');
@@ -13,51 +16,19 @@ app.use(cookieSession({
   keys: ['user_id'],
 }));
 
-function generateRandomString() {
-  const possibleChars = 'ABCDEFGHIJKLMOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let newString = '';
-  for (let i = 0; i < 6; i++) {
-    const index = Math.floor(Math.random() * possibleChars.length);
-    newString += possibleChars[index];
-  }
-  return newString;
-}
-
 const users = {
-  "aJ48lW": {
-    id:  "aJ48lW",
-    email: "123@123.com",
-    password: "123"
-  }
 };
-
 
 const urlDatabase = {
-  'b2xVn2': {longURL: 'http://www.lighthouselabs.ca', userID:  "aJ48lW"},
-  '9sm5xK': {longURL: 'http://www.google.com', userID:  "aJ48lW"}
+  'abc': { longURL: 'http://www.google.com', userID: '123'}
 };
 
-
-function urlsForUser (id) {
-  let userUrls = {};
-  for (url in urlDatabase) {
-    if (urlDatabase[url].userID === id) {
-      userUrls[url] = urlDatabase[url].longURL;
-    }
-  }
-  return userUrls;
-}
-
-function getUserByEmail (email, database) {
-  for (let user in database) {
-    if (database[user].email === email) {
-      return database[user];
-    }
-  }
-}
-
 app.get('/', (req, res) => {
-  res.send('Hello!');
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login')
+  }
 });
 
 app.get('/hello', (req, res) => {
@@ -92,7 +63,7 @@ app.post('/register', (req, res) => {
 
 // For iterating through an object
 app.get('/urls', (req, res) => {
-  const userURLs = urlsForUser(req.session.user_id);
+  const userURLs = urlsForUser(req.session.user_id, urlDatabase);
   let templateVars = { user_id: req.session.user_id, urls: userURLs, users: users };
   res.render('urls_index', templateVars);
 });
@@ -115,12 +86,12 @@ app.post('/login', (req, res) => {
   const lookupEmailResult = getUserByEmail(req.body.emailAddress, users);
   console.log(lookupEmailResult)
   if (lookupEmailResult) {
-    if (bcrypt.compareSync(req.body.pwd, lookupEmailResult.password)) {
-      req.session.user_id = lookupEmailResult.id;
+    if (bcrypt.compareSync(req.body.pwd, users[lookupEmailResult].password)) {
+      req.session.user_id = users[lookupEmailResult].id;
       res.redirect('/urls')
     } else {
       res.statusCode = 403;
-      res.send("ERROR 403: Password does not match email")
+      res.send("ERROR 403: Password does not match email");
     }
   } else {
     res.statusCode = 403;
@@ -150,13 +121,24 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  let templateVars = { user_id: req.session.user_id, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, users: users }
+  let templateVars = { user_id: req.session.user_id, shortURL: req.params.shortURL, users: users, longURL: undefined, owner: false }
+  if (urlDatabase[req.params.shortURL]) {
+    templateVars.longURL = urlDatabase[req.params.shortURL].longURL;
+    if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
+      templateVars.owner = true;
+    }
+  }
   res.render('urls_show', templateVars);
 });
 
 app.get('/u/:shortURL', (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(longURL);
+  if (urlDatabase[req.params.shortURL]) {
+    const longURL = urlDatabase[req.params.shortURL].longURL;
+    res.redirect(longURL);
+  } else {
+    res.statusCode = 400;
+    res.send("404 Not Found.")
+  }
 });  
 
 app.post('/urls/:shortURL/delete', (req, res) => {
