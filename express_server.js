@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
 const { getUserByEmail } = require('./helpers');
 const { generateRandomString } = require('./helpers');
 const { urlsForUser } = require('./helpers');
+const methodOverride = require('method-override');
 
 
 app.set('view engine', 'ejs');
@@ -26,7 +27,8 @@ const users = {
 const urlDatabase = {
 };
 
-// ========================================================================================================================================================
+app.use(methodOverride('_method'));
+//========================================================================================================================================================
 
 
 // HOMEPAGE
@@ -128,7 +130,7 @@ app.get('/urls/:shortURL', (req, res) => {
 });
 
 // EDITS THE LONGURL OF THE EXISTING SHORTURL
-app.post('/urls/:shortURL/edit', (req, res) => {
+app.put('/urls/:shortURL', (req, res) => {
   if (req.session.user_id) {
     const shortURL = req.params.shortURL;
     const longURL = req.body.longURL;
@@ -150,7 +152,7 @@ app.get('/u/:shortURL', (req, res) => {
 });  
 
 // DELETES A SHORTURL
-app.post('/urls/:shortURL/delete', (req, res) => {
+app.delete('/urls/:shortURL', (req, res) => {
   if (req.session.user_id) {
     const shortURL = req.params.shortURL;
     delete urlDatabase[shortURL]
