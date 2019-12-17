@@ -1,4 +1,3 @@
-// =======SET UP FOR TINYAPP==========================================================================================================================
 const express = require('express');
 const app = express();
 const PORT = 8080;
@@ -28,8 +27,6 @@ const urlDatabase = {
 };
 
 app.use(methodOverride('_method'));
-//========================================================================================================================================================
-
 
 // HOMEPAGE
 app.get('/', (req, res) => {
@@ -103,7 +100,7 @@ app.post('/urls', (req, res) => { // CREATES
 
 // CREATES A NEW URL AND POSTS TO /URLS (ABOVE)
 app.get('/urls/new', (req, res) => {  // POPS UP THE FORM
-  if (req.session.user_id === undefined) {
+  if (!req.session.user_id) {
     res.redirect("/login");
   } else {
     let templateVars = { user_id: req.session.user_id, users: users};
